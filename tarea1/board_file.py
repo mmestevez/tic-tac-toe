@@ -18,10 +18,15 @@ class Board(object):
     def print_board(self, board_printer):
         board_printer.print_board(self.board, self.last_token_coordinate)
 
+    def is_valid_move(self, row, column):
+        if self._is_space_in_bounds(row, column) and self._is_space_available(
+                row, column):
+            return True
+        return False
+
     def make_move(self, token_title, row, column):
-        if self._is_space_in_bounds(row, column):
-            if self._is_space_available(row, column):
-                self._place_move(token_title, row, column)
+        self.board[row][column].set_title(token_title)
+        self.last_token_coordinate = [row, column]
 
     def _is_space_in_bounds(self, row, column):
         try:
@@ -41,10 +46,6 @@ class Board(object):
         except IOError:
             BoardPrinter.print_used_space_message()
             return False
-
-    def _place_move(self, token_title, row, column):
-        self.board[row][column].set_title(token_title)
-        self.last_token_coordinate = [row, column]
 
     def look_for_winner(self):
         return self.board_reviewer.get_winner(self.board)

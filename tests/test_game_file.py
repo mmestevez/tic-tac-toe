@@ -52,4 +52,5 @@ class GameTests(unittest.TestCase):
         expected = False
         self.assertEqual(expected, result)
 
-    def test_is_players_turn__no_turn_
+    def test_is_players_turn__no_turn_(self):
+        pass
