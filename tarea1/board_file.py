@@ -10,8 +10,10 @@ TOKEN_SYMBOLS = {'x': 'X', 'o': 'O', 'nil': ' '}
 class Board(object):
     def __init__(self, board_size):
         board_creator = BoardCreator()
-        self.board = board_creator.create_board(board_size)
+        self.board = board_creator.create(board_size)
         self.board_size = board_size
+        """ Last token coordinate must be bigger than the
+        board so brackets don't show in the empty board """
         self.last_token_coordinate = [board_size + 1, board_size + 1]
         self.board_reviewer = BoardReviewer()
 
@@ -27,6 +29,12 @@ class Board(object):
     def make_move(self, token_title, row, column):
         self.board[row][column].set_title(token_title)
         self.last_token_coordinate = [row, column]
+
+    def look_for_winner(self):
+        return self.board_reviewer.get_winner(self.board)
+
+    def look_for_draw(self):
+        return self.board_reviewer.look_for_draw(self.board)
 
     def _is_space_in_bounds(self, row, column):
         try:
@@ -46,12 +54,6 @@ class Board(object):
         except IOError:
             BoardPrinter.print_used_space_message()
             return False
-
-    def look_for_winner(self):
-        return self.board_reviewer.get_winner(self.board)
-
-    def look_for_draw(self):
-        return self.board_reviewer.look_for_draw(self.board)
 
 
 class BoardReviewer(object):
@@ -177,22 +179,22 @@ class BoardCreator(object):
     def __init__(self):
         pass
 
-    def create_board(self, length):
+    def create(self, length):
         board = []
         for row_number in range(length + 1):
-            row = self.create_board_row(length, row_number)
+            row = self._create_row(length, row_number)
             board.append(row)
         return board
 
-    def create_board_row(self, length, row):
+    def _create_row(self, length, row):
         row_with_tokens = []
         for position in range(length + 1):
-            token = self.get_corresponding_token(position, row)
+            token = self._get_corresponding_token(position, row)
             row_with_tokens.append(token)
         return row_with_tokens
 
     @staticmethod
-    def get_corresponding_token(position, row):
+    def _get_corresponding_token(position, row):
         title_for_token = TOKEN_SYMBOLS['nil']
         if row == 0:
             if position != 0:

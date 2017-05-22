@@ -52,5 +52,24 @@ class GameTests(unittest.TestCase):
         expected = False
         self.assertEqual(expected, result)
 
-    def test_is_players_turn__no_turn_(self):
-        pass
+    def test_is_players_turn__no_turn_assigned_try_with_x__returns_true(self):
+        # Arrange
+        game = game_file.Game()
+
+        # Act
+        result = game.is_players_turn('X')
+
+        # Assert
+        expected = True
+        self.assertEqual(expected, result)
+
+    def test_is_players_turn__no_turn_assigned_try_with_o__returns_true(self):
+        # Arrange
+        game = game_file.Game()
+
+        # Act
+        result = game.is_players_turn('O')
+
+        # Assert
+        expected = True
+        self.assertEqual(expected, result)
