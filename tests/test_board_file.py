@@ -3,8 +3,6 @@ import unittest
 from tarea1 import board_file
 
 
-# 11 tests
-
 class BoardTests(unittest.TestCase):
     def test_is_space_available__space_available__returns_True(self):
         # Arrange

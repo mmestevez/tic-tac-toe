@@ -238,50 +238,6 @@ class GamePrinter(object):
         print 'Game over. Its a tye'
 
 
-class InputParser(object):
-    pass
-
-    def parse_command(self, command):
-        if re.search(r'^start', command):
-            self.parse_start_command(command)
-        elif re.search(r'^play ', command):
-            self.parse_play_command(command)
-        elif re.search(r'(^help)|(-h$)', command):
-            self.parse_help_command(command)
-        elif re.search(r'^score', command):
-            self.parse_exit_command()
-
-    @staticmethod
-    def parse_start_command(command):
-        if re.match(r'^--(silent --consecutive)|(consecutive --silent) [3-9]$',
-                    command):
-            return set_consecutive_silent
-        elif re.search(r'^--(silent)|(consecutive) [3-9]$', command):
-            command = command.split()
-            if re.search(r'(--silent)', command[0]):
-                return set_silent
-            else:
-                return set_consecutive
-
-    @staticmethod
-    def is_number(command):
-        if re.search(r'^[3-9]$', command):
-            return True
-        return False
-
-    def parse_play_command(self, command):
-        pass
-
-    def parse_help_command(self, command):
-        pass
-
-    def parse_score_command(self, command):
-        pass
-
-    def parse_exit_command(self, command):
-        pass
-
-
 class InputReader(object):
     @staticmethod
     def get_input():
