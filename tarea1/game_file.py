@@ -8,12 +8,12 @@ COMMANDS = ['start', 'play', 'board', 'score', 'help', 'exit']
 
 class Game(object):
     def __init__(self):
-        self.silent_mode = False
-        self.consecutive_mode = False
+        self.is_silent_mode = False
+        self.is_consecutive_mode = False
         self.turn = 0
         self.score = self._set_score()
         self.board = board_file.Board(0)
-        self.game_on = False
+        self.is_game_on = False
 
     def run(self, game_printer, input_reader):
         game_printer.print_welcome_message()
@@ -25,19 +25,19 @@ class Game(object):
             if re.search(r'(^help$)|(-h$)', command):
                 self.help(command)
             elif re.search(r'^start ', command):
-                if self.game_on:
+                if self.is_game_on:
                     game_printer.print_game_on_message()
                     continue
                 self.start(command, game_printer)
 
             elif re.search(r'^play ', command):
-                if not self.game_on:
+                if not self.is_game_on:
                     game_printer.print_start_new_game_message()
                     continue
                 self.play(command, game_printer)
 
             elif re.search(r'^board$', command):
-                if self.game_on:
+                if self.is_game_on:
                     self.board.print_board(board_printer)
                 else:
                     game_printer.print_start_new_game_message()
@@ -50,12 +50,12 @@ class Game(object):
                 exit()
             else:
                 game_printer.print_wrong_format_message()
-            if self.game_on and not self.silent_mode:
+            if self.is_game_on and not self.is_silent_mode:
                 self.board.print_board(board_printer)
 
     def start(self, command, game_printer):
-        self.silent_mode = False
-        self.consecutive_mode = False
+        self.is_silent_mode = False
+        self.is_consecutive_mode = False
         settings = command[6:]
         if re.search(r'^[3-9]$', settings):
             board_size = int(settings)
@@ -64,21 +64,21 @@ class Game(object):
                 settings):
             settings = settings.split()
             board_size = int(settings[-1])
-            self.silent_mode = True
-            self.consecutive_mode = True
+            self.is_silent_mode = True
+            self.is_consecutive_mode = True
         elif re.search(r'^--(silent)|(consecutive) [3-9]$', settings):
             settings = settings.split()
             board_size = int(settings[-1])
             if re.search(r'(--silent)', settings[0]):
-                self.silent_mode = True
+                self.is_silent_mode = True
             else:
-                self.consecutive_mode = True
+                self.is_consecutive_mode = True
         else:
             game_printer.print_wrong_format_message()
             game_printer.print_start_format()
             return
         self.board = board_file.Board(board_size)
-        self.game_on = True
+        self.is_game_on = True
         self.turn = 0
 
     def play(self, expression, game_printer):
@@ -99,11 +99,11 @@ class Game(object):
                     score_manager = score_file.ScoreManager()
                     self.score.update(player, score_manager)
                     self._set_next_turn(board_file.TOKEN_SYMBOLS['nil'])
-                    self.game_on = False
+                    self.is_game_on = False
 
                 else:
                     if self.board.look_for_draw():
-                        self.game_on = False
+                        self.is_game_on = False
                         game_printer.print_game_over_tye()
 
                     self._set_next_turn(board_file.TOKEN_SYMBOLS['nil'])
@@ -165,7 +165,7 @@ class Game(object):
         return False
 
     def _set_next_turn(self, player):
-        if self.consecutive_mode:
+        if self.is_consecutive_mode:
             self.turn = player
         else:
             if player == 'X':
@@ -181,6 +181,16 @@ class Game(object):
         score_list = score_reader.read_scores()
         score = score_reader.create_score(score_list)
         return score
+
+    def set_consecutive_silent(self):
+        self.set_consecutive()
+        self.set_silent()
+
+    def set_consecutive(self):
+        self.is_consecutive_mode = True
+
+    def set_silent(self):
+        self.is_silent_mode = True
 
 
 class GamePrinter(object):
@@ -232,18 +242,32 @@ class InputParser(object):
     pass
 
     def parse_command(self, command):
-        if re.match(r'^start', command):
+        if re.search(r'^start', command):
             self.parse_start_command(command)
-        elif re.match(r'^play ', command):
+        elif re.search(r'^play ', command):
             self.parse_play_command(command)
-        elif re.match(r'(^help)|(-h$)', command):
+        elif re.search(r'(^help)|(-h$)', command):
             self.parse_help_command(command)
-        elif re.match(r'^score', command):
+        elif re.search(r'^score', command):
             self.parse_exit_command()
 
-    def parse_start_command(self, command):
+    @staticmethod
+    def parse_start_command(command):
+        if re.match(r'^--(silent --consecutive)|(consecutive --silent) [3-9]$',
+                    command):
+            return set_consecutive_silent
+        elif re.search(r'^--(silent)|(consecutive) [3-9]$', command):
+            command = command.split()
+            if re.search(r'(--silent)', command[0]):
+                return set_silent
+            else:
+                return set_consecutive
 
-        pass
+    @staticmethod
+    def is_number(command):
+        if re.search(r'^[3-9]$', command):
+            return True
+        return False
 
     def parse_play_command(self, command):
         pass

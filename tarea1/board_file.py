@@ -21,7 +21,7 @@ class Board(object):
         board_printer.print_board(self.board, self.last_token_coordinate)
 
     def is_valid_move(self, row, column):
-        if self._is_space_in_bounds(row, column) and self._is_space_available(
+        if self.is_space_in_bounds(row, column) and self.is_space_available(
                 row, column):
             return True
         return False
@@ -36,7 +36,7 @@ class Board(object):
     def look_for_draw(self):
         return self.board_reviewer.look_for_draw(self.board)
 
-    def _is_space_in_bounds(self, row, column):
+    def is_space_in_bounds(self, row, column):
         try:
             token = self.board[row][column]
             return True
@@ -44,7 +44,7 @@ class Board(object):
             BoardPrinter.print_out_of_bounds_message()
             return False
 
-    def _is_space_available(self, row, column):
+    def is_space_available(self, row, column):
         try:
             token = self.board[row][column]
 
