@@ -21,7 +21,7 @@ class Game(object):
         while True:
             game_printer.print_legend()
             command = input_reader.get_input()
-
+            command = command.lower()
             if re.search(r'(^help$)|(-h$)', command):
                 self.help(command)
             elif re.search(r'^start ', command):
